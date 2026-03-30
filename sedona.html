@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Sedona Wash Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f7f7f5;
+    --bg3: #f0f0ed;
+    --border: #e4e4e0;
+    --text: #1a1a1a;
+    --text2: #555551;
+    --text3: #99998f;
+    --accent: #1a1a1a;
+    --kid-bg: #fffbf0;
+    --kid-border: #f0d080;
+    --kid-text: #7a5800;
+    --warn-text: #b06000;
+    --radius: 10px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg2);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  .topbar {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 20px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .topbar-sub { font-size: 12px; color: var(--text3); margin-top: 3px; }
+  .topbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .topbar-time { text-align: right; flex-shrink: 0; margin-left: 12px; }
+  .topbar-time .t1 { font-size: 15px; font-weight: 600; }
+  .topbar-time .t2 { font-size: 11px; color: var(--text3); }
+
+  .progress-wrap { margin-top: 12px; }
+  .progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s ease; width: 0%; }
+  .progress-label { font-size: 10px; color: var(--text3); margin-top: 5px; }
+
+  .supplies-section {
+    margin: 14px 14px 0;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .supplies-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .supplies-label-text { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); }
+  .supplies-chevron { font-size: 11px; color: var(--text3); transition: transform 0.2s; }
+  .supplies-body { display: none; padding: 0 16px 14px; border-top: 1px solid var(--border); }
+  .supplies-body.open { display: block; }
+  .supplies-chevron.open { transform: rotate(90deg); }
+  .supplies-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin-top: 10px; }
+  .sup-item { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 7px; line-height: 1.4; }
+  .sup-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+
+  .kid-banner {
+    margin: 10px 14px 0;
+    background: var(--kid-bg);
+    border: 1px solid var(--kid-border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--kid-text);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+  .kid-banner span { font-weight: 400; font-size: 12px; display: block; margin-top: 2px; }
+
+  .phase { margin: 14px 14px 0; }
+  .phase-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 0 2px; }
+  .phase-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
+  .phase-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .phase-dur { font-size: 11px; color: var(--text3); margin-left: auto; }
+
+  .step-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: opacity 0.15s;
+  }
+  .step-card.done { opacity: 0.45; }
+
+  .step-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    cursor: pointer;
+    min-height: 56px;
+  }
+
+  .step-num { font-size: 12px; font-weight: 600; color: var(--text3); min-width: 20px; padding-top: 2px; flex-shrink: 0; }
+  .step-content { flex: 1; min-width: 0; }
+  .step-action { font-size: 15px; font-weight: 500; line-height: 1.4; color: var(--text); }
+  .step-detail { font-size: 13px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+  .step-note { font-size: 12px; color: var(--text3); margin-top: 5px; line-height: 1.5; padding: 8px 10px; background: var(--bg2); border-radius: 6px; }
+  .step-note.warn { color: var(--warn-text); background: #fff8f0; }
+
+  .kid-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--kid-text);
+    background: var(--kid-bg);
+    border: 1px solid var(--kid-border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-top: 6px;
+  }
+
+  .step-check { flex-shrink: 0; padding-top: 2px; }
+  .check-box {
+    width: 24px; height: 24px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .check-box.checked { background: var(--accent); border-color: var(--accent); }
+  .check-icon { display: none; color: #fff; font-size: 13px; line-height: 1; }
+  .check-box.checked .check-icon { display: block; }
+
+  .reset-wrap { margin: 20px 14px 0; text-align: center; }
+  .reset-btn {
+    background: none; border: 1px solid var(--border);
+    border-radius: 8px; font-family: inherit;
+    font-size: 13px; color: var(--text3);
+    padding: 10px 20px; cursor: pointer; width: 100%;
+  }
+  .reset-btn:active { background: var(--bg3); }
+
+  .doc-footer { margin: 20px 14px 0; font-size: 11px; color: var(--text3); text-align: center; line-height: 1.7; }
+
+  @media (min-width: 640px) {
+    body { max-width: 560px; margin: 0 auto; }
+    .topbar { position: sticky; border-radius: 0; }
+    .phase, .supplies-section, .kid-banner, .reset-wrap, .doc-footer { margin-left: 20px; margin-right: 20px; }
+  }
+
+  @media print {
+    .topbar { position: static; }
+    .progress-wrap { display: none; }
+    .step-card.done { opacity: 1; }
+    .check-box { border-color: #999; }
+    @page { margin: 0.5in; size: letter portrait; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <div>
+      <div class="topbar-title">2017 Kia Sedona</div>
+      <div class="topbar-sub">Monthly wash · Street/curb setup</div>
+    </div>
+    <div class="topbar-time">
+      <div class="t1">~50 min</div>
+      <div class="t2">21 steps</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="progress-label" id="progress-label">0 of 21 done</div>
+  </div>
+</div>
+
+<div class="supplies-section">
+  <button class="supplies-toggle" onclick="toggleSupplies()">
+    <span class="supplies-label-text">Gather first</span>
+    <span class="supplies-chevron" id="sup-chevron">▶</span>
+  </button>
+  <div class="supplies-body" id="sup-body">
+    <div class="supplies-grid">
+      <div class="sup-item"><span class="sup-dot"></span>Pressure washer + soap blaster</div>
+      <div class="sup-item"><span class="sup-dot"></span>Slick-N-Slide soap</div>
+      <div class="sup-item"><span class="sup-dot"></span>2× labeled buckets</div>
+      <div class="sup-item"><span class="sup-dot"></span>Wash mitt + wheel brush</div>
+      <div class="sup-item"><span class="sup-dot"></span>DeWalt vac + detailing kit</div>
+      <div class="sup-item"><span class="sup-dot"></span>Turtle Wax Ceramic Spray</div>
+      <div class="sup-item"><span class="sup-dot"></span>Invisible Glass</div>
+      <div class="sup-item"><span class="sup-dot"></span>Leather cleaner + conditioner</div>
+      <div class="sup-item"><span class="sup-dot"></span>Microfiber towels (6+)</div>
+    </div>
+  </div>
+</div>
+
+<div class="kid-banner">
+  ★ Steps marked with this tag are safe for the kids to help.
+  <span>5yo and 3yo can both do starred steps with a little supervision.</span>
+</div>
+
+
+<!-- PHASE 1: SETUP -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-tag">Phase 1</span>
+    <span class="phase-name">Setup</span>
+    <span class="phase-dur">5 min</span>
+  </div>
+
+  <div class="step-card" id="s1">
+    <div class="step-main" onclick="toggle(1)">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-action">Park at curb, stage equipment</div>
+        <div class="step-detail">Run the power cord along the curb edge, out of the road.</div>
+        <div class="step-note">Keep kids on the sidewalk side during setup.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c1"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s2">
+    <div class="step-main" onclick="toggle(2)">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-action">Fill two buckets</div>
+        <div class="step-detail">Bucket 1: water + Slick-N-Slide. Bucket 2: clean water only. Label them.</div>
+        <div class="kid-tag">★ kids — can help pour soap into Bucket 1</div>
+        <div class="step-note">Always rinse mitt in Bucket 2 before re-dipping in Bucket 1. This prevents scratches.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c2"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s3">
+    <div class="step-main" onclick="toggle(3)">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-action">Load soap blaster</div>
+        <div class="step-detail">Attach to wand. Fill with diluted Slick-N-Slide (blaster ratio — more diluted than the bucket).</div>
+        <div class="step-note warn">Green nozzle (25°) on paint only. Never use the red nozzle on the car.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c3"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PHASE 2: EXTERIOR -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-tag">Phase 2</span>
+    <span class="phase-name">Exterior</span>
+    <span class="phase-dur">25 min</span>
+  </div>
+
+  <div class="step-card" id="s4">
+    <div class="step-main" onclick="toggle(4)">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-action">Pre-rinse — no soap</div>
+        <div class="step-detail">Green nozzle, 12–18" from paint. Roof → sides → bumpers → wheel wells → sliding door tracks.</div>
+        <div class="step-note">Sliding door tracks get the most grime — linger there. Full 3 min.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c4"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s5">
+    <div class="step-main" onclick="toggle(5)">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <div class="step-action">Soap blast — full car</div>
+        <div class="step-detail">Coat entire car top-to-bottom in foam. Let sit 2–3 min. Don't let it dry.</div>
+        <div class="step-note">Work in shade. While foam dwells → go to Step 6.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c5"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s6">
+    <div class="step-main" onclick="toggle(6)">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <div class="step-action">Wheels &amp; tires (while foam dwells)</div>
+        <div class="step-detail">Wheel brush + soap bucket. Scrub face, lug holes, tire sides. Rinse each with green nozzle.</div>
+        <div class="step-note warn">Never use the wash mitt on wheels — it will scratch the paint later.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c6"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s7">
+    <div class="step-main" onclick="toggle(7)">
+      <div class="step-num">7</div>
+      <div class="step-content">
+        <div class="step-action">Rinse foam off</div>
+        <div class="step-detail">Green nozzle, top-to-bottom. Keep moving — don't hold still on one spot.</div>
+        <div class="step-note">Still see suds? Keep rinsing.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c7"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s8">
+    <div class="step-main" onclick="toggle(8)">
+      <div class="step-num">8</div>
+      <div class="step-content">
+        <div class="step-action">Wash with mitt</div>
+        <div class="step-detail">Roof → hood → sides top to bottom → bumpers last. Straight lines only, no circles.</div>
+        <div class="step-note">Rinse mitt in Bucket 2 after every panel, reload from Bucket 1.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c8"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s9">
+    <div class="step-main" onclick="toggle(9)">
+      <div class="step-num">9</div>
+      <div class="step-content">
+        <div class="step-action">Final rinse</div>
+        <div class="step-detail">Top-to-bottom. Crack windows, rinse door tops. Don't forget door jambs.</div>
+        <div class="step-note">Check: no soap suds anywhere.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c9"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s10">
+    <div class="step-main" onclick="toggle(10)">
+      <div class="step-num">10</div>
+      <div class="step-content">
+        <div class="step-action">Dry</div>
+        <div class="step-detail">Clean microfiber, top-down. Pat or drag — no scrubbing. Open each door, dry the sills.</div>
+        <div class="kid-tag">★ kids — can dry lower doors and bumpers with their own towel</div>
+        <div class="step-note">Work fast in sun — water spots form quickly.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c10"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PHASE 3: INTERIOR -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-tag">Phase 3</span>
+    <span class="phase-name">Interior</span>
+    <span class="phase-dur">18 min</span>
+  </div>
+
+  <div class="step-card" id="s11">
+    <div class="step-main" onclick="toggle(11)">
+      <div class="step-num">11</div>
+      <div class="step-content">
+        <div class="step-action">Pull &amp; clean all-weather mats — all 3 rows</div>
+        <div class="step-detail">Shake out, spray both sides with green nozzle, lean against car to dry.</div>
+        <div class="kid-tag">★ kids — can shake out the rear mats</div>
+        <div class="step-note">Don't reinstall until fully dry.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c11"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s12">
+    <div class="step-main" onclick="toggle(12)">
+      <div class="step-num">12</div>
+      <div class="step-content">
+        <div class="step-action">Vacuum — all 3 rows</div>
+        <div class="step-detail">Crevice tool in seat seams. Brush on fabric first. Seats forward → rear floor. Seats back → front floor.</div>
+        <div class="kid-tag">★ kids — 5yo can vacuum the third-row floor</div>
+        <div class="step-note">Check under second-row seats — that's where snacks disappear.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c12"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s13">
+    <div class="step-main" onclick="toggle(13)">
+      <div class="step-num">13</div>
+      <div class="step-content">
+        <div class="step-action">Vacuum vents</div>
+        <div class="step-detail">Detailing brush flicks dust out, vacuum right behind it.</div>
+        <div class="step-note">One quick pass per vent.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c13"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s14">
+    <div class="step-main" onclick="toggle(14)">
+      <div class="step-num">14</div>
+      <div class="step-content">
+        <div class="step-action">Leather seats — clean</div>
+        <div class="step-detail">Apply cleaner to cloth (not directly on seat). Small sections, wipe off clean. All rows.</div>
+        <div class="step-note">Focus on seat bolsters (sides). Don't skip rear seats even if they look fine.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c14"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s15">
+    <div class="step-main" onclick="toggle(15)">
+      <div class="step-num">15</div>
+      <div class="step-content">
+        <div class="step-action">Leather seats — condition</div>
+        <div class="step-detail">Thin coat on a clean cloth. Work in, wait 2 min, buff lightly with dry microfiber.</div>
+        <div class="step-note">Less is more. Do the steering wheel too.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c15"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s16">
+    <div class="step-main" onclick="toggle(16)">
+      <div class="step-num">16</div>
+      <div class="step-content">
+        <div class="step-action">Wipe hard surfaces</div>
+        <div class="step-detail">Damp microfiber on dash, console, door panels, sliding door rails, cup holders.</div>
+        <div class="kid-tag">★ kids — can wipe lower door panels and cup holders</div>
+        <div class="step-note warn">Spray the cloth, not the screen.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c16"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s17">
+    <div class="step-main" onclick="toggle(17)">
+      <div class="step-num">17</div>
+      <div class="step-content">
+        <div class="step-action">Interior glass</div>
+        <div class="step-detail">Invisible Glass on microfiber. Up-down strokes, then side-to-side. Buff off haze with dry towel.</div>
+        <div class="kid-tag">★ kids — can wipe the rear side windows</div>
+        <div class="step-note">Do in shade. Sliding door windows get the most kid handprints — extra passes there.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c17"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PHASE 4: FINISHING -->
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-tag">Phase 4</span>
+    <span class="phase-name">Finishing</span>
+    <span class="phase-dur">7 min</span>
+  </div>
+
+  <div class="step-card" id="s18">
+    <div class="step-main" onclick="toggle(18)">
+      <div class="step-num">18</div>
+      <div class="step-content">
+        <div class="step-action">Ceramic spray — exterior paint</div>
+        <div class="step-detail">Car must be dry. 2–3 pumps on microfiber. Wipe one panel, flip towel, buff off within 60 sec. Roof → hood → sides → bumpers.</div>
+        <div class="step-note">Skip wheels, rubber trim, and glass. Work in shade.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c18"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s19">
+    <div class="step-main" onclick="toggle(19)">
+      <div class="step-num">19</div>
+      <div class="step-content">
+        <div class="step-action">Exterior glass</div>
+        <div class="step-detail">Invisible Glass on microfiber. All windows + mirrors. Buff dry.</div>
+        <div class="step-note">Windshield corners collect wiper residue — extra attention there.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c19"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s20">
+    <div class="step-main" onclick="toggle(20)">
+      <div class="step-num">20</div>
+      <div class="step-content">
+        <div class="step-action">Reinstall mats</div>
+        <div class="step-detail">Only once fully dry. Clip into anchors in each row.</div>
+        <div class="step-note">Still damp? Leave out 15 more min.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c20"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="step-card" id="s21">
+    <div class="step-main" onclick="toggle(21)">
+      <div class="step-num">21</div>
+      <div class="step-content">
+        <div class="step-action">Walkthrough + cleanup</div>
+        <div class="step-detail">Walk all the way around. Wipe door jambs before closing. Drain buckets, coil cord.</div>
+        <div class="kid-tag">★ kids — can drain buckets and put away towels</div>
+        <div class="step-note">Done.</div>
+      </div>
+      <div class="step-check"><div class="check-box" id="c21"><span class="check-icon">✓</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="reset-wrap">
+  <button class="reset-btn" onclick="resetAll()">Reset all checkboxes</button>
+</div>
+
+<div class="doc-footer">
+  2017 Kia Sedona SX · Monthly Wash Guide<br>
+  ★ = safe for kids to help<br>
+  21 steps · ~50 min
+</div>
+
+<script>
+  const TOTAL = 21;
+  let checked = new Set();
+
+  function toggle(n) {
+    const box = document.getElementById('c' + n);
+    const card = document.getElementById('s' + n);
+    if (checked.has(n)) {
+      checked.delete(n);
+      box.classList.remove('checked');
+      card.classList.remove('done');
+    } else {
+      checked.add(n);
+      box.classList.add('checked');
+      card.classList.add('done');
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = Math.round((checked.size / TOTAL) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = checked.size + ' of ' + TOTAL + ' done';
+  }
+
+  function resetAll() {
+    checked.clear();
+    for (let i = 1; i <= TOTAL; i++) {
+      document.getElementById('c' + i).classList.remove('checked');
+      document.getElementById('s' + i).classList.remove('done');
+    }
+    updateProgress();
+  }
+
+  function toggleSupplies() {
+    const body = document.getElementById('sup-body');
+    const chev = document.getElementById('sup-chevron');
+    body.classList.toggle('open');
+    chev.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
